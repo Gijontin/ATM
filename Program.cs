@@ -7,22 +7,22 @@ class Program {
     //deklaera en variable för aktuellt saldo
     static int balance = 0;
     static string amount = "";
-    static void ReportBalance() {
-        //Console.WriteLine($"Du har {balance} kr på ditt konto.");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"Ditt saldo: {balance} kr.\n");
-        Console.ForegroundColor = ConsoleColor.White;
-    }
+
+
     static void Main() {
+        
+        Account newAccount = new Account();
 
         while (true) {
             
             Console.Clear();
-            ReportBalance();
+            newAccount.ReportBalance();
             
             //insättning
             Console.WriteLine("Hur mycket vill du sätta in?");
-            
+            newAccount.balance = newAccount.Deposit(Console.ReadLine());
+            break;
+/*
             //deklarera en variable för insättning
             //var amount = Console.ReadLine(); //tryck enter för fortsättning
             amount = Console.ReadLine();
@@ -36,6 +36,7 @@ class Program {
                 Console.ForegroundColor = ConsoleColor.White;
                 Thread.Sleep(1000);
             }
+*/
         }
 /*
         if (string.IsNullOrWhiteSpace(amount)) {
@@ -53,7 +54,7 @@ class Program {
         //balance = balance - int.Parse(amount); fult och dåligt sätt
         balance -= int.Parse(amount);            //snyggt och pro sätt
 
-        ReportBalance();
+        newAccount.ReportBalance();
 
         /*
         
