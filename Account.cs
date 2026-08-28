@@ -12,6 +12,9 @@ class Account {
         Console.ForegroundColor = ConsoleColor.White;
     }
     public void Deposit(string userInput) {
+
+        Console.WriteLine("Hur mycket vill du sätta in?"); //måste ha en wrapper eller något för prompten dyker inte upp due to ReadLine i parametenr...
+
         decimal validAmount = 0m; //notera: decimal-typen har ändelsen 'm' ('d' är för double-typen)
 
         if (decimal.TryParse(userInput, out validAmount)){ //TryParse är typ en ternary operator
@@ -30,6 +33,9 @@ class Account {
     }
 
     public void Withdraw(string userInput) {
+
+        Console.WriteLine("Hur mycket vill du ta ut?"); //måste ha en wrapper eller något för prompten dyker inte upp due to ReadLine i parametenr...
+
         decimal validAmount = 0m; //notera: decimal-typen har ändelsen 'm' ('d' är för double-typen)
 
         if (decimal.TryParse(userInput, out validAmount) && (balance > validAmount)){ //TryParse är typ en ternary operator

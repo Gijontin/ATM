@@ -8,6 +8,8 @@ class Program {
         
         Account newAccount = new Account();
 
+        Menu.drawMenu(newAccount);
+
         while (true) {
             
             Console.Clear();
