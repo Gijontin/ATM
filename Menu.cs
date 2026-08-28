@@ -18,7 +18,7 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
 
     */
     public static (string label, Action<Account> callback)[] menuList = { //string namn + funktion (typ void pointer grejen i C)
-        ("Deposit", (currentAccount) => currentAccount.Deposit(Console.ReadLine())),
+        ("Deposit", (currentAccount) => currentAccount.Deposit()),
         ("Withdraw", (currentAccount) => currentAccount.Withdraw(Console.ReadLine())),
         ("Balance", (currentAccount) => currentAccount.ReportBalance()),
         ("Exit", (generic) => Environment.Exit(0)),
@@ -58,6 +58,7 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
             if (key.Key == ConsoleKey.Enter) {
                 menuList[menuIndex].callback(currentAccount);
             }
+
         } while (true);
     }
 }

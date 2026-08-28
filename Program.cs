@@ -17,7 +17,7 @@ class Program {
             
             //insättning
             Console.WriteLine("Hur mycket vill du sätta in?"); //lägg in detta i deposit funktionen om vi ska göra menyer sen
-            newAccount.Deposit(Console.ReadLine());
+            //newAccount.Deposit(Console.ReadLine());
             break;
         }
 
@@ -28,7 +28,7 @@ class Program {
 
             //uttag
             Console.WriteLine("Hur mycket vill du ta ut?"); //lägg in detta i withdraw funktionen om vi ska göra menyer sen
-            newAccount.Withdraw(Console.ReadLine());
+            //newAccount.Withdraw(Console.ReadLine());
             break;
         }
     }
