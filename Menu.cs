@@ -19,7 +19,7 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
     */
     public static (string label, Action<Account> callback)[] menuList = { //string namn + funktion (typ void pointer grejen i C)
         ("Deposit", (currentAccount) => currentAccount.Deposit()),
-        ("Withdraw", (currentAccount) => currentAccount.Withdraw(Console.ReadLine())),
+        ("Withdraw", (currentAccount) => currentAccount.Withdraw()),
         ("Balance", (currentAccount) => currentAccount.ReportBalance()),
         ("Exit", (generic) => Environment.Exit(0)),
     };

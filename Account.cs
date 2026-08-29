@@ -39,19 +39,20 @@ class Account {
         }
     }
 
-    public void Withdraw(string userInput) { //McWrapper
+    public void Withdraw() { //McWrapper
         Console.Clear();
         Console.WriteLine("Hur mycket vill du ta ut?"); //måste ha en wrapper eller något för prompten dyker inte upp due to ReadLine i parametenr...
 
         WithdrawCheck(Console.ReadLine());
     }
-    public void WithdrawCheck(string userInput) {
+    
+    void WithdrawCheck(string userInput) {
         decimal validAmount = 0m; //notera: decimal-typen har ändelsen 'm' ('d' är för double-typen)
 
         if (decimal.TryParse(userInput, out validAmount) && (balance > validAmount)){ //TryParse är typ en ternary operator
             balance -= validAmount;
-            Console.WriteLine($"{validAmount} kr uttaget.");
-            Console.WriteLine("Tryck på valfri tangent för att fortsätta...");
+            Console.WriteLine($"\n{validAmount} kr uttaget.");
+            Console.WriteLine("\nTryck på valfri tangent för att fortsätta...");
             Console.ReadLine();
         } else {
             Console.ForegroundColor = ConsoleColor.Red;

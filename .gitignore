@@ -393,6 +393,9 @@ FodyWeavers.xsd
 !.vscode/extensions.json
 *.code-workspace
 
+# Specifically for the VSCODE extension Peacock's colour changes
+.vscode/settings.json
+
 # Local History for Visual Studio Code
 .history/
 
