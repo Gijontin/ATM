@@ -49,7 +49,7 @@ class Account {
     void WithdrawCheck(string userInput) {
         decimal validAmount = 0m; //notera: decimal-typen har ändelsen 'm' ('d' är för double-typen)
 
-        if (decimal.TryParse(userInput, out validAmount) && (balance > validAmount)){ //TryParse är typ en ternary operator
+        if (decimal.TryParse(userInput, out validAmount) && (balance >= validAmount)){ //TryParse är typ en ternary operator
             balance -= validAmount;
             Console.WriteLine($"\n{validAmount} kr uttaget.");
             Console.WriteLine("\nTryck på valfri tangent för att fortsätta...");
