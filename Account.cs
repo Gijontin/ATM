@@ -4,6 +4,7 @@
 */
 
 public class Account {
+    private readonly KontoData _data;
     private readonly int _kontonummer;
     private AccountType _kontotyp; //sikta på databasdriven/value objects eller polymorfiska typer i framtiden
     private string? _fullname;
@@ -12,10 +13,10 @@ public class Account {
     private decimal _balance; //decimal eftersom både double och float har avrundningsfel
 
     //private readonly List<bankomat.transaktionsHistorik> _transaktioner = new List<bankomat.transaktionsHistorik>();
-    private readonly List<bankomat.transaktionsHistorik> _transaktioner = [];
+    private readonly List<StorBank.transaktionsHistorik> _transaktioner = [];
     private void RegisterTransaktionsHistorik(string typ, decimal belopp) {
-        var tran = new bankomat.transaktionsHistorik{
-            tidsstämpel = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        var tran = new StorBank.transaktionsHistorik{
+            tidsstämpel = DateTime.Now, //.ToString("yyyy-MM-dd HH:mm:ss"),
             transaktionsTyp = typ,
             belopp = belopp,
         };
@@ -23,7 +24,7 @@ public class Account {
     }
 //-------------------------------------------------------------------------------------------------------------------
 // => i detta fallet blir en readonly funktion(?), håller själva balance privat så att den inte koms åt genom huvudprogrammet iaf
-    public List<bankomat.transaktionsHistorik> Transaktioner => _transaktioner;
+    public List<StorBank.transaktionsHistorik> Transaktioner => _transaktioner;
     public decimal Balance => _balance; //"expression-bodied property"
 //-------------------------------------------------------------------------------------------------------------------
     //bara för transaktionshistorik recording grejs
@@ -38,6 +39,18 @@ public Account(int kontonummer, AccountType kontotyp, string? fullname, int pin,
     _pin          = pin;
     _skapat      = skapat;
     _balance     = balance;
+
+//skriv om konstruktorn att bara ta in KontoData parameter...
+    KontoData kd = new() {
+        kontonummer = kontonummer,
+        kontotyp = kontotyp,
+        fullname = fullname,
+        pin = pin,
+        skapat = skapat,
+        balance = balance,
+    };
+
+    _data = kd;
 }
 
     public void DisplayTransaktionsHistorik() {

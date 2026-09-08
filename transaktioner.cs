@@ -1,12 +1,9 @@
-namespace bankomat;
-
-public record transaktionsHistorik{
-    public string? tidsstämpel;
-    public string? transaktionsTyp;
-    public decimal belopp;
+namespace StorBank {
+    public record transaktionsHistorik{
+        public DateTime tidsstämpel;
+        public string? transaktionsTyp;
+        public decimal belopp;
+    }
 }
 
-public record accountInfo {
-    
-}
     

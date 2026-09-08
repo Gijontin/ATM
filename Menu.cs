@@ -1,6 +1,42 @@
 static class Menu { //public static så att jag inte behöver construct:a ett menu object för att använda denna klassen
     private const string arrow = "--> ";
+    private static void StorBankHeader() {
+        
+        string header = "StorBank - För Dem Som Tål Riktigt Mycket Bank";
+        string midPad = "|$$$|$$$|$$$|$$$|$$$|$$$|";
 
+        int midPadLen = midPad.Length * 2;
+        int width = Console.WindowWidth;
+        int padding = (width - header.Length) / 2;
+        int innerWidth = width - midPadLen;
+        int pad = Math.Max((innerWidth - header.Length) / 2, 0);
+
+        string centered = 
+            midPad + 
+            new string(' ', pad) +
+            header +
+            new string(' ', Math.Max(innerWidth - pad - header.Length, 0)) +
+            midPad; //We got "center div'd text" at home
+
+        string line = new string('=', width);
+
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine(line);
+        Console.WriteLine(centered);
+        Console.WriteLine(line);
+        Console.WriteLine();
+        Console.ResetColor();
+    }
+    
+    private static void inputAccountCreate() {
+        /*
+        
+        SKRIVA JÄVLA BRA MED SÄKERHETSSPÄRRAR SÅ ATT ALL INPUT BLIR KORREKT HÄR, YO...
+
+        //fyll i allt som behövs för en KontoData record och sedan skicka den till factoryn inuti denna metoden
+        
+        */
+    }
     /*
     "tuple" array (det är basically en struct array i C-språket, enda coola skillnaden är hur du nästan instantly kan deklarera den)
     Action<Type> gör att funktions call:et fungerar på vilket skapat objekt ifrån Account klassen, typ
@@ -53,13 +89,14 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
         ("Exit",        (generic)        => {Console.Clear(); Environment.Exit(0);}),
     };
 
-    public static void drawMenu(Account currentAccount) {
+    public static void accountMenu(Account currentAccount) {
         int menuIndex = 0;
         do {
             try {
                 //do {
                     Console.Clear();
 
+                    StorBankHeader();
                 //print menuList strings
                     for (int i = 0; i < menuList.Length; i++) {
                         if (menuIndex == i) {
@@ -112,5 +149,46 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
                 Thread.Sleep(1000);  
             }
         } while (true); 
+    }
+
+    public static void mainMenu() {
+        int menuIndex = 0;
+
+        do {
+            try {
+
+                Console.Clear();
+
+            //"GUI"
+
+                StorBankHeader();
+
+                for (int i = 0; i < 3; i++) {
+                    if (menuIndex == i) {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write(arrow);
+                        Console.WriteLine($"{i +1}. {menuList[i].label}");
+                    }
+                    else {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine($"{i +1}. {menuList[i].label}");
+                    }
+                }
+
+            //check input for switching between options and activating selected option
+                ConsoleKeyInfo key = Console.ReadKey();
+                switch (key.Key) {
+                    default: {
+                        int direktMenyVal;
+                        if (tryParseMenuInput(key, out direktMenyVal)){
+                            //meny[direktMenyVal] för denna funktionen
+                        }
+                    }
+                    break;
+                }
+            } catch {
+                
+            }
+        } while (true);
     }
 }
