@@ -48,7 +48,6 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
         ("Deposit",     (currentAccount) => currentAccount.Deposit()),
         ("Withdraw",    (currentAccount) => currentAccount.Withdraw()),
         ("Balance",     (currentAccount) => currentAccount.DisplayBalance(true)),
-        //("Transaction", (currentAccount) => currentAccount.DisplayTransactionHistory()),
         ("Transaction", (currentAccount) => currentAccount.DisplayTransaktionsHistorik()),
         ("Gurka",       (currentAccount) => currentAccount.gurkTransaction()),
         ("Exit",        (generic)        => {Console.Clear(); Environment.Exit(0);}),
@@ -115,21 +114,3 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
         } while (true); 
     }
 }
-
-/*
-    ORGINAL, MEN UPPGIFTEN VILLE HA ETT SWITCH-CASE STATEMENT ISTÄLLET SÅ....
-
-            if (key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) {
-                if (menuIndex > 0) {
-                    menuIndex--;
-                }
-            }
-            else if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) {
-                if (menuIndex < (menuList.Length - 1)) {
-                    menuIndex++;
-                }
-            }
-            if (key.Key == ConsoleKey.Enter) {
-                menuList[menuIndex].callback(currentAccount);
-            }
-*/

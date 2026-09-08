@@ -1,42 +1,45 @@
-class Account {
 /*
-    public void registerTransaktion(string Transaktionstyp, decimal belopp) {
-        transaktioner.Add($"Transaktionsdatum: {DateTime.Now} - Transaktionstyp: {Transaktionstyp} - Transaktionsvärde: {belopp}");
-    }
-    public void DisplayTransactionHistory() {
-
-        Console.Clear();
-        Console.WriteLine("Transaktionshistorik för konto:\n");
-
-        foreach (var tran in Transaktioner) {
-            Console.WriteLine(tran);
-        }
-
-        Console.WriteLine(); //simpel skiljerad (vet ej om är baseline idiomatin eller baseline idiotin)
-        DisplayBalance(false);
-        genUtil.pressToContinue();
-    }
+    EGENTLIGEN BÖR DE FLESTA FNUKTIONER BARA SKICKA SERVER REQUESTS 
+    OCH HANTERA UI UPDATES BASERAT PÅ SERVERNS SVAR...
 */
-    private const string _uttag = "uttag"; //(egentligen)server-side var.
-    private const string _insättning = "insättning"; //(egentligen)server-side var.
 
-//-------------------------------------------------------------------------------------------------------------------
-// => i detta fallet blir en readonly funktion(?), håller själva balance privat så att den inte koms åt genom huvudprogrammet iaf
-
-    //(egentligen)server-side op.
-    private readonly List<transaktionsHistorik> _transaktioner = new List<transaktionsHistorik>();
-    public List<transaktionsHistorik> Transaktioner => _transaktioner;
+public class Account {
+    private readonly int _kontonummer;
+    private AccountType _kontotyp; //sikta på databasdriven/value objects eller polymorfiska typer i framtiden
+    private string? _fullname;
+    private readonly int _pin;
+    private readonly DateTime _skapat;
     private decimal _balance; //decimal eftersom både double och float har avrundningsfel
-    public decimal Balance => _balance; //"expression-bodied property"
 
+    //private readonly List<bankomat.transaktionsHistorik> _transaktioner = new List<bankomat.transaktionsHistorik>();
+    private readonly List<bankomat.transaktionsHistorik> _transaktioner = [];
     private void RegisterTransaktionsHistorik(string typ, decimal belopp) {
-        var tran = new transaktionsHistorik{
+        var tran = new bankomat.transaktionsHistorik{
             tidsstämpel = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             transaktionsTyp = typ,
             belopp = belopp,
         };
         _transaktioner.Add(tran);
     }
+//-------------------------------------------------------------------------------------------------------------------
+// => i detta fallet blir en readonly funktion(?), håller själva balance privat så att den inte koms åt genom huvudprogrammet iaf
+    public List<bankomat.transaktionsHistorik> Transaktioner => _transaktioner;
+    public decimal Balance => _balance; //"expression-bodied property"
+//-------------------------------------------------------------------------------------------------------------------
+    //bara för transaktionshistorik recording grejs
+    private const string _uttag = "uttag"; //(egentligen)server-side var.
+    private const string _insättning = "insättning"; //(egentligen)server-side var.
+//--------------------------------------------------------------------------------------------------------------------
+    
+public Account(int kontonummer, AccountType kontotyp, string? fullname, int pin, DateTime skapat, decimal balance) {
+    _kontonummer = kontonummer;
+    _kontotyp    = kontotyp;
+    _fullname    = fullname;
+    _pin          = pin;
+    _skapat      = skapat;
+    _balance     = balance;
+}
+
     public void DisplayTransaktionsHistorik() {
         
         Console.Clear();
@@ -50,8 +53,7 @@ class Account {
         DisplayBalance(false);
         genUtil.pressToContinue();
     }
-//-------------------------------------------------------------------------------------------------------------------
-    public void gurkTransaction() {
+    public void gurkTransaction() { //GURKA
 
         Console.Clear();
         
@@ -66,7 +68,6 @@ class Account {
 
         genUtil.pressToContinue();
     }
-
     public void DisplayBalance(bool clearTerminal) { //if false betyder (oftast) att du återanvänder funktionen's WriteLine del i andra funktioner...
         
         if (clearTerminal) 
@@ -99,7 +100,6 @@ class Account {
             DisplayBalance(false);
             genUtil.pressToContinue();
         }
-
     public void Withdraw() { //McWrapper
         Console.Clear();
         Console.WriteLine("Hur mycket vill du ta ut?"); //måste ha en wrapper eller något för prompten dyker inte upp due to ReadLine i parametenr...
