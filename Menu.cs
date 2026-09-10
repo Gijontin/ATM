@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-static class Menu { //public static så att jag inte behöver construct:a ett menu object för att använda denna klassen
+static class Menu {
     private const string arrow = "--> ";
     private static void StorBankHeader() {
         
@@ -29,7 +29,27 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
         Console.WriteLine();
         Console.ResetColor();
     }
-    
+    private static void ValideringsTextFörNamn(string str1, bool ärGiltligt) {
+        Console.WriteLine();
+        Console.Write("Namnet: ");
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write($"{str1} ");
+        Console.ResetColor();
+        Console.Write("är ");
+
+        if (ärGiltligt) {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("giltligt!\n\n");
+            Console.ResetColor();  
+        } else {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("ogiltligt!");
+            Console.ResetColor();
+            Console.Write(" Försök igen...\n\n");
+            
+        }
+        genUtil.pressToContinue();
+    }
     private static string getName() {
         Console.Clear();
         StorBankHeader();
@@ -38,8 +58,6 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
         string surname    = "";
         string helaNamnet = "";
 
-        //Genom att sätta frågetecknet innan Trim: 
-            //Trim(tar bort whitespace) händer bara inputten inte är tom(null)
         do {
             try {
             //FED name INPUT + CHECK
@@ -47,49 +65,22 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
                 if (!genUtil.testaValideraNamn(Console.ReadLine(), out name)){
                     Console.WriteLine("Något blev fel, försök igen");
                 }
-/*
-                name = Console.ReadLine()?.Trim();  
-                    if (string.IsNullOrWhiteSpace(name)) {
-                        throw new Exception("Fältet måste fyllas i, försök igen...");
-                    }
-                    //REGEX verkar coolt... bättre att kolla om invalid characters returns true än att checka tillåtna characters returns true
-                    if (Regex.IsMatch(name, "[^\\p{L}-]")) { //om siffror och symboler som oftast inte finns i namn ingår så kasta error...
-                        throw new Exception("Otillåtna tecken, försök igen..."); 
-                    }
-*/
                 
             //FED surname INPUT + CHECK
                 Console.WriteLine("\nAnge ditt efternamn:");
                 if (!genUtil.testaValideraNamn(Console.ReadLine(), out surname)) {
                     Console.WriteLine("Något blev fel, försök igen");
                 }
-/*
-                surname = Console.ReadLine()?.Trim();  
-                    if (string.IsNullOrWhiteSpace(surname)) {
-                        throw new Exception("Fältet måste fyllas i, försök igen...");
-                    }
-                    if (Regex.IsMatch(surname, "[^\\p{L}-]")) { //om siffror och symboler som oftast inte finns i namn ingår så kasta error...
-                        throw new Exception("Otillåtna tecken, försök igen..."); 
-                    }
-*/
 
             //FED helaNamnet CHECK
                 helaNamnet = name + " " + surname;
                     if (Regex.IsMatch(helaNamnet, "[^\\p{L} ]")) { //om siffror och symboler som oftast inte finns i namn ingår så kasta error...
+                        ValideringsTextFörNamn(helaNamnet, false);
                         throw new Exception("Otillåtna tecken, försök igen..."); 
                     }
 
             //VALID RETURN
-                Console.WriteLine();
-                Console.Write("Namnet: ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write($"{helaNamnet} ");
-                Console.ResetColor();
-                Console.Write("är ");
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("giltligt!\n\n");
-                Console.ResetColor();
-                genUtil.pressToContinue();
+                ValideringsTextFörNamn(helaNamnet, true);
 
                 return helaNamnet;
             } 
@@ -104,14 +95,25 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
             }
         } while (true);
     }
+
+    private static int makePIN(string input) {
+        int pinkod;
+
+        if (int.TryParse(input, out pinkod)) {
+            return pinkod;
+        }
+        
+        return 0;
+    }
     private static void inputAccountCreate() {
 
         KontoData kd = new();
+
+        kd.fullname = getName();
+        while (!genUtil.testaValideraPIN(out kd.pin)); //ja, jag är fast i C tänk...
         /*
         
         SKRIVA JÄVLA BRA MED SÄKERHETSSPÄRRAR SÅ ATT ALL INPUT BLIR KORREKT HÄR, YO...
-
-        kd.fullname = getName(Console.ReadLine());
 
         //fyll i allt som behövs för en KontoData record och sedan skicka den till factoryn inuti denna metoden
             public int kontonummer;
@@ -124,7 +126,7 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
     }
 
 //OVERLOADED METHOD ----------------------------------------------------------------------------------------------------------------------------------
-    //Mom says: We got tryParse at home... (funkar bara i Menu due to return logic, ändra den om du vill ha en mer global util)
+    //Mom says: We got tryParse at home... (gjord endast för meny listorna/funktionerna)
     private static bool tryParseMenuInput(ConsoleKeyInfo tangentbordsknapptryck,(string label, Action<Account> callback)[] menu , out int siffra) {
 
         /*
@@ -198,9 +200,9 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
     };
 
     public static (string label, Action callback)[] mainMenuList = {
-        ("Login To Account",   () => Console.Clear()),
-        ("Create New Account", () => getName()),
-        ("Exit",               () => {Console.Clear(); Environment.Exit(0);}),
+        ("Login To Account.",   () => Console.Clear()),
+        ("Create New Account.", () => getName()),
+        ("Exit.",               () => {Console.Clear(); Environment.Exit(0);}),
     };
     public static void accountMenu(Account currentAccount) {
         int menuIndex = 0;
@@ -221,15 +223,17 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
                             Console.WriteLine($"{i +1}. {accountMenuList[i].label}");
                         }
                     }
-                    
-                //check input for switching between options and activating selected option
+                
+                //MENU TOGGLE/ACTIVATION
+
                     ConsoleKeyInfo key = Console.ReadKey();
 
                     switch (key.Key) {                             //viktigt att gräva upp .Key i ConsoleKeyInfo variabeln...
-                        case ConsoleKey.W or ConsoleKey.UpArrow: { //testar bara en variation
+                        case ConsoleKey.W or ConsoleKey.UpArrow: { 
                                 if (menuIndex > 0){
                                     menuIndex--;
-                                } else if (menuIndex <= 0) { //should loop around to the bottom of the menuList
+                                } else if (menuIndex <= 0) {
+                                    //loop around to the BOTTOM of the menuList
                                     menuIndex = (accountMenuList.Length - 1);
                                 }
                             }
@@ -239,6 +243,7 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
                                 if (menuIndex < (accountMenuList.Length - 1)) {
                                     menuIndex++;
                                 }  else if (menuIndex >= (accountMenuList.Length - 1)) {
+                                    //loop around to the TOP of the menuList
                                     menuIndex = 0;
                                 }
                             }
@@ -249,10 +254,9 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
                             break;
                         default: {
                             int direktMenyVal = 0;
-                            //riktig hacky custom TryParse variant för att jag vill kunna instant-välja i menyn via nummerisk input också...
-                                if (tryParseMenuInput(key, accountMenuList, out direktMenyVal)) {
-                                    accountMenuList[direktMenyVal].callback(currentAccount);
-                                }
+                            if (tryParseMenuInput(key, accountMenuList, out direktMenyVal)) { //hacky af, probably error prone...
+                                accountMenuList[direktMenyVal].callback(currentAccount);
+                            }
                             }
                             break;
                     }
@@ -289,13 +293,16 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
                     }
                 }
 
-            //check input for switching between options and activating selected option
+            //MENU TOGGLE/ACTIVATION
+
                 ConsoleKeyInfo key = Console.ReadKey();
+
                 switch (key.Key) {
                     case ConsoleKey.W or ConsoleKey.UpArrow: {
                             if (menuIndex > 0){
                                 menuIndex--;
-                            } else if (menuIndex <= 0) { //should loop around to the bottom of the menuList
+                            } else if (menuIndex <= 0) {
+                                //loop around to the BOTTOM of menuList
                                 menuIndex = (mainMenuList.Length - 1);
                             }
                         }
@@ -304,6 +311,7 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
                             if (menuIndex < (mainMenuList.Length - 1)) {
                                 menuIndex++;
                             }  else if (menuIndex >= (mainMenuList.Length - 1)) {
+                                //loop around to the TOP of menuList
                                 menuIndex = 0;
                             }                       
                         }
@@ -314,7 +322,7 @@ static class Menu { //public static så att jag inte behöver construct:a ett me
                         break;
                     default: {
                         int direktMenyVal;
-                        if (tryParseMenuInput(key, mainMenuList, out direktMenyVal)){
+                        if (tryParseMenuInput(key, mainMenuList, out direktMenyVal)){ //hacky af, probably error prone...
                             mainMenuList[direktMenyVal].callback();
                         }
                     }
