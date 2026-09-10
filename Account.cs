@@ -5,13 +5,15 @@
 
 public class Account {
     private readonly KontoData _data;
+
+//-------- LÅT KontoData TA ÖVER DETTA (så blir Account mest bara en funktionswrapper för KontoData) ----------------
     private readonly int _kontonummer;
     private AccountType _kontotyp; //sikta på databasdriven/value objects eller polymorfiska typer i framtiden
     private string? _fullname;
     private readonly int _pin;
     private readonly DateTime _skapat;
     private decimal _balance; //decimal eftersom både double och float har avrundningsfel
-
+//--------------------------------------------------------------------------------------------------------------------
     //private readonly List<bankomat.transaktionsHistorik> _transaktioner = new List<bankomat.transaktionsHistorik>();
     private readonly List<StorBank.transaktionsHistorik> _transaktioner = [];
     private void RegisterTransaktionsHistorik(string typ, decimal belopp) {

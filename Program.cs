@@ -11,7 +11,11 @@ class Program {
         */
         AccountFactory AF = new();
 
+        //TEST: KONTOSKAPARMENU 
+        Menu.mainMenu();
+
         //Account newAccount = new Account();
+
         Account newAccount = AF.SkapaAccount(AccountType.SPARKONTO, "Bullen Grodtvätt", 6969, 0m);
         Menu.accountMenu(newAccount);
     }
