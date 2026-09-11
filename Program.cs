@@ -13,6 +13,8 @@ class Program {
         AccountFactory AF = new();
 
         //test av funktion
+        
+/*
         if (genUtil.testaValideraPIN(out int sant)) {
             Console.WriteLine("Lyckat!");
             Thread.Sleep(2500);
@@ -20,6 +22,7 @@ class Program {
             Console.WriteLine("Misslyckat");
             Thread.Sleep(2500);
         }
+*/
 
         //TEST: KONTOSKAPARMENU 
         Menu.mainMenu();

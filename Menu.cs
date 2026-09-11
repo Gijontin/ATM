@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 static class Menu {
     private const string arrow = "--> ";
     private static void StorBankHeader() {
@@ -50,14 +48,43 @@ static class Menu {
         }
         genUtil.pressToContinue();
     }
+    private static void SkrivRöttSleep(string str) {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(str);
+        Console.ResetColor();
+        Thread.Sleep(1500);
+    }
     private static string getName() {
-        Console.Clear();
-        StorBankHeader();
+        genUtil.ValideringsResultat<string> resultat;
         //parse deez bad boiz
-        string name       = "";
-        string surname    = "";
-        string helaNamnet = "";
+        string name;
+        string surname;
+        
+        do {
+            Console.WriteLine("\nAnge ditt förnamn:");
+            resultat = genUtil.testaValideraNamn(Console.ReadLine()); //"Console.ReadLine()" kan anses vara frontend här och testaValidera är backend (I think)... 
 
+            if (!resultat.succee) {
+                SkrivRöttSleep(resultat.msg);
+            }
+        } while (!resultat.succee);
+        name = resultat.value;
+
+        do {
+            Console.WriteLine("\nAnge ditt efternamn:");
+            resultat = genUtil.testaValideraNamn(Console.ReadLine());
+
+            if (!resultat.succee) {
+                SkrivRöttSleep(resultat.msg);
+            }
+        } while (!resultat.succee);
+        surname = resultat.value;
+
+        string helaNamnet = name + " " + surname;
+        ValideringsTextFörNamn(helaNamnet, true);
+        return helaNamnet;
+
+/*
         do {
             try {
             //FED name INPUT + CHECK
@@ -94,35 +121,61 @@ static class Menu {
                 StorBankHeader();
             }
         } while (true);
+*/
     }
+    private static int getPIN() {
+        genUtil.ValideringsResultat<int> resultat;
 
-    private static int makePIN(string input) {
-        int pinkod;
+        do {
+            Console.WriteLine("\nAnge din önskade fyr-siffriga PIN-kod:");
+            resultat = genUtil.testaValideraPIN();
 
-        if (int.TryParse(input, out pinkod)) {
-            return pinkod;
-        }
+            if (!resultat.succee) {
+                SkrivRöttSleep(resultat.msg);
+            }
+        } while (!resultat.succee);
+
+        return resultat.value;
+    }
+    public static string getMejl() { //wrapper
+        genUtil.ValideringsResultat<string> resultat;
+
+        do {
+            Console.WriteLine("\nAnge din mejladress:");
+            resultat = genUtil.testaValideraMejl(Console.ReadLine());
+
+            if (!resultat.succee) {
+                SkrivRöttSleep(resultat.msg);
+            }
+        } while (!resultat.succee);
+
+        return resultat.value;
+    }
+    private static void CallAccountCreate() {
         
-        return 0;
-    }
-    private static void inputAccountCreate() {
-
         KontoData kd = new();
-
+    //userinput
         kd.fullname = getName();
-        while (!genUtil.testaValideraPIN(out kd.pin)); //ja, jag är fast i C tänk...
-        /*
-        
-        SKRIVA JÄVLA BRA MED SÄKERHETSSPÄRRAR SÅ ATT ALL INPUT BLIR KORREKT HÄR, YO...
+        kd.mejladress = getMejl();
+        kd.pin = getPIN();
 
-        //fyll i allt som behövs för en KontoData record och sedan skicka den till factoryn inuti denna metoden
-            public int kontonummer;
-            public AccountType kontotyp; //sikta på databasdriven/value objects eller polymorfiska typer i framtiden
-            public string? fullname;
-            public int pin;
-            public DateTime skapat;
-            public decimal balance; //decimal eftersom både double och float har avrundningsfel
+    //system auto-fill
+        kd.kontotyp = AccountType.SPARKONTO;
+        kd.balance = 0m;
+        kd.kontonummer = 0;
+
+        kd.skapat = DateTime.Now;
+
+        /*
+        - Skapa ett account via denna datan
+        
+        - Spara acconutet i en Dictionary där key:n är mejladressen(username, typ)
+        
+        - Skriv någon metod som tar emot PIN, dubbelkollar den mot kontot för tillträde att logga in
+          på kontot genom att injicera det i accountMenu för att komma åt dess funktioner
+        
         */
+        return;
     }
 
 //OVERLOADED METHOD ----------------------------------------------------------------------------------------------------------------------------------
@@ -201,7 +254,7 @@ static class Menu {
 
     public static (string label, Action callback)[] mainMenuList = {
         ("Login To Account.",   () => Console.Clear()),
-        ("Create New Account.", () => getName()),
+        ("Create New Account.", () => CallAccountCreate()),
         ("Exit.",               () => {Console.Clear(); Environment.Exit(0);}),
     };
     public static void accountMenu(Account currentAccount) {
