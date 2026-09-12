@@ -4,7 +4,7 @@
 */
 
 public class Account {
-    private readonly KontoData _data;
+    public readonly KontoData _data;
 
 //-------- LÅT KontoData TA ÖVER DETTA (så blir Account mest bara en funktionswrapper för KontoData) ----------------
     private readonly int _kontonummer;
@@ -34,6 +34,8 @@ public class Account {
     private const string _insättning = "insättning"; //(egentligen)server-side var.
 //--------------------------------------------------------------------------------------------------------------------
     
+    public Account(KontoData kd) {
+/*
 public Account(int kontonummer, AccountType kontotyp, string? fullname, int pin, DateTime skapat, decimal balance) {
     _kontonummer = kontonummer;
     _kontotyp    = kontotyp;
@@ -51,7 +53,7 @@ public Account(int kontonummer, AccountType kontotyp, string? fullname, int pin,
         skapat = skapat,
         balance = balance,
     };
-
+*/
     _data = kd;
 }
 

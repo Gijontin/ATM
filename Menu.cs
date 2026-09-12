@@ -1,6 +1,17 @@
-static class Menu {
+public class Menu {
     private const string arrow = "--> ";
-    private static void StorBankHeader() {
+    private readonly KontoHanterare _KH;
+    public readonly (string label, Action callback)[] mainMenuList; //måste in i constructorn för att kompilatorn inte kan gissa Actiontypen tillräckligt bra... (till skillnad från min första tupleArray..)
+    public Menu() {
+        _KH = new(); 
+
+        mainMenuList = [
+            ("Login To Account.",   () => RequestLoginAccount()),
+            ("Create New Account.", () => RequestCreateAccount()),
+            ("Exit.",               () => {Console.Clear(); Environment.Exit(0);}),
+        ];
+    }
+    private void StorBankHeader() {
         
         string header = "StorBank - För Dem Som Tål Riktigt Mycket Bank";
         string midPad = "|$$$|$$$|$$$|$$$|$$$|$$$|";
@@ -27,7 +38,7 @@ static class Menu {
         Console.WriteLine();
         Console.ResetColor();
     }
-    private static void ValideringsTextFörNamn(string str1, bool ärGiltligt) {
+    private void ValideringsTextFörNamn(string str1, bool ärGiltligt) {
         Console.WriteLine();
         Console.Write("Namnet: ");
         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -48,13 +59,13 @@ static class Menu {
         }
         genUtil.pressToContinue();
     }
-    private static void SkrivRöttSleep(string str) {
+    private void SkrivRöttSleep(string str) {
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(str);
         Console.ResetColor();
         Thread.Sleep(1500);
     }
-    private static string getName() {
+    private string getName() {
         genUtil.ValideringsResultat<string> resultat;
         //parse deez bad boiz
         string name;
@@ -83,47 +94,10 @@ static class Menu {
         string helaNamnet = name + " " + surname;
         ValideringsTextFörNamn(helaNamnet, true);
         return helaNamnet;
-
-/*
-        do {
-            try {
-            //FED name INPUT + CHECK
-                Console.WriteLine("Ange ditt förnamn:");
-                if (!genUtil.testaValideraNamn(Console.ReadLine(), out name)){
-                    Console.WriteLine("Något blev fel, försök igen");
-                }
-                
-            //FED surname INPUT + CHECK
-                Console.WriteLine("\nAnge ditt efternamn:");
-                if (!genUtil.testaValideraNamn(Console.ReadLine(), out surname)) {
-                    Console.WriteLine("Något blev fel, försök igen");
-                }
-
-            //FED helaNamnet CHECK
-                helaNamnet = name + " " + surname;
-                    if (Regex.IsMatch(helaNamnet, "[^\\p{L} ]")) { //om siffror och symboler som oftast inte finns i namn ingår så kasta error...
-                        ValideringsTextFörNamn(helaNamnet, false);
-                        throw new Exception("Otillåtna tecken, försök igen..."); 
-                    }
-
-            //VALID RETURN
-                ValideringsTextFörNamn(helaNamnet, true);
-
-                return helaNamnet;
-            } 
-            catch (Exception ex){
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
-                Console.ResetColor();
-                Thread.Sleep(2000); //fika på det
-                
-                Console.Clear();
-                StorBankHeader();
-            }
-        } while (true);
-*/
     }
-    private static int getPIN() {
+    private int getPIN() { //"getPIN" fyller egentligen mellansteget från frontend till backend, testavalidera har just nu en
+                                  //frontend/backend hybrid funktion (testaValidera ska egentligen bara ha logik-checken från 'Enter')
+                                  //medans allt annat input grejs som händer i testValidera bör hända i frontend, dvs funktion här i Menu
         genUtil.ValideringsResultat<int> resultat;
 
         do {
@@ -137,7 +111,7 @@ static class Menu {
 
         return resultat.value;
     }
-    public static string getMejl() { //wrapper
+    public string getMejl() { //wrapper
         genUtil.ValideringsResultat<string> resultat;
 
         do {
@@ -151,36 +125,72 @@ static class Menu {
 
         return resultat.value;
     }
-    private static void CallAccountCreate() {
-        
+    public void RequestCreateAccount() {
+        Console.Clear();
+        StorBankHeader();
+
+    // MOVE THIS PART TO KONTOHANTERARE OR OTHER BACKEND------------------------
         KontoData kd = new();
-    //userinput
+    
+        //userinput
         kd.fullname = getName();
         kd.mejladress = getMejl();
         kd.pin = getPIN();
 
-    //system auto-fill
+        //system auto-fill
         kd.kontotyp = AccountType.SPARKONTO;
         kd.balance = 0m;
         kd.kontonummer = 0;
 
         kd.skapat = DateTime.Now;
+    //--------------------------------------------------------------------------
 
+        _KH.CreateAccount(kd);
+            
+        Console.WriteLine("\nKontot har skapats!\n");
+        genUtil.pressToContinue();
+        
         /*
         - Skapa ett account via denna datan
+        KontoHanteraren.AccountCreate(Kd);
         
         - Spara acconutet i en Dictionary där key:n är mejladressen(username, typ)
-        
+            //KontoHanteraren gör detta...
+
         - Skriv någon metod som tar emot PIN, dubbelkollar den mot kontot för tillträde att logga in
           på kontot genom att injicera det i accountMenu för att komma åt dess funktioner
-        
+            //sub-funktion i kontoHanteraren validerar detta, ganska någon privat metod i Account synergize:ar verifikationen där med...
         */
+
+        
         return;
+    }
+    public void RequestLoginAccount() {
+        Console.Clear();
+        StorBankHeader();
+
+        //ja du, gissa vad som ska hända här...
+
+        //be användaren skicka in username
+            // - backend checkar om de hittar username 
+            // > ny meny_segment som efterfrågar valid password (pinkoden i detta fallet)
+            // > backend checkar validerar PIN
+            // - vid godkänt hämtar backend konto information och menyn tar dig till...
+            //...account menyn med account-specifika menyOptions som request:ar accountets metoder
+
+
+        //test
+        foreach (var kn in _KH.AccountListan) {
+            Console.WriteLine(kn.Key);
+        }
+
+        Console.WriteLine();
+        genUtil.pressToContinue();
     }
 
 //OVERLOADED METHOD ----------------------------------------------------------------------------------------------------------------------------------
     //Mom says: We got tryParse at home... (gjord endast för meny listorna/funktionerna)
-    private static bool tryParseMenuInput(ConsoleKeyInfo tangentbordsknapptryck,(string label, Action<Account> callback)[] menu , out int siffra) {
+    private bool tryParseMenuInput(ConsoleKeyInfo tangentbordsknapptryck,(string label, Action<Account> callback)[] menu , out int siffra) {
 
         /*
             GGEZ ASCII KOD TRICK:
@@ -203,7 +213,7 @@ static class Menu {
         }
         return false; 
     }
-    private static bool tryParseMenuInput(ConsoleKeyInfo tangentbordsknapptryck,(string label, Action callback)[] menu , out int siffra) {
+    private bool tryParseMenuInput(ConsoleKeyInfo tangentbordsknapptryck,(string label, Action callback)[] menu , out int siffra) {
 
         /*
             GGEZ ASCII KOD TRICK:
@@ -227,7 +237,7 @@ static class Menu {
         return false; 
     }
 //------------------------------------------------------------------------------------------------------------------------------------------------------
-    public static (string label, Action<Account> callback)[] accountMenuList = { //string namn + funktion (typ void pointer grejen i C)
+    public (string label, Action<Account> callback)[] accountMenuList = { //string namn + funktion (typ void pointer grejen i C)
     /*
     "tuple" array (det är basically en struct array i C-språket, enda coola skillnaden är hur du nästan instantly kan deklarera den)
     Action<Type> gör att funktions call:et fungerar på vilket skapat objekt ifrån Account klassen, typ
@@ -252,12 +262,7 @@ static class Menu {
         ("Exit",        (generic)        => {Console.Clear(); Environment.Exit(0);}),
     };
 
-    public static (string label, Action callback)[] mainMenuList = {
-        ("Login To Account.",   () => Console.Clear()),
-        ("Create New Account.", () => CallAccountCreate()),
-        ("Exit.",               () => {Console.Clear(); Environment.Exit(0);}),
-    };
-    public static void accountMenu(Account currentAccount) {
+    public void accountMenu(Account currentAccount) {
         int menuIndex = 0;
         do {
             try {
@@ -323,7 +328,7 @@ static class Menu {
         } while (true); 
     }
 
-    public static void mainMenu() {
+    public void mainMenu() {
         int menuIndex = 0;
 
         do {

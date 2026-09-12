@@ -1,6 +1,4 @@
-using System.Dynamic;
 using System.Text.RegularExpressions;
-using System.Transactions;
 
 public static class genUtil {
     //HashSet<T> är egentligen snabbare när man kommer upp i hundratals array:er
@@ -13,8 +11,8 @@ public static class genUtil {
     
     //catch-all grejen som alla tester åker igenom, fungerar för allt om den används med rätt logik...
     public record ValideringsResultat<T>(bool succee, T value, string msg); //sjukt tips från LLM efter jag frågade om tips för förbättringar, exdee
-    public static ValideringsResultat<string> testaValideraMejl(string input) {
-        string validInput = input?.Trim();
+    public static ValideringsResultat<string> testaValideraMejl(string? input) {
+        string validInput = input?.Trim() ?? ""; // = if input is empty then validInput gets the empty string of ""
 
         //skriver över min gamla funktions if-checks till en test-bool med msg lista och sedan loopar...
         //styrkan ligger i felmeddelanden för usern som inte är lika goto-brutala som catch
@@ -45,7 +43,7 @@ public static class genUtil {
         return new(true, validInput, "Giltlig mejladress!"); //return bool, str, (string)message;
     }
     
-    public static ValideringsResultat<string> testaValideraNamn(string input) {
+    public static ValideringsResultat<string> testaValideraNamn(string? input) {
         if (string.IsNullOrWhiteSpace(input)) {
             return new(false, "", "Detta fält kan inte lämnas tomt.");
         }

@@ -2,6 +2,7 @@
 
 class Program {
     static void Main() {
+        Menu menu = new();
         /*
             MENU:
             1. Login To Account. //id to account, then pin to get into it
@@ -10,7 +11,7 @@ class Program {
         
             Använd mejladress som Dictionary key och sedan lagra Account...
         */
-        AccountFactory AF = new();
+        //AccountFactory AF = new();
 
         //test av funktion
         
@@ -24,12 +25,13 @@ class Program {
         }
 */
 
+        menu.mainMenu();
         //TEST: KONTOSKAPARMENU 
-        Menu.mainMenu();
+        //Menu.mainMenu();
 
-        //Account newAccount = new Account();
-
-        Account newAccount = AF.SkapaAccount(AccountType.SPARKONTO, "Bullen Grodtvätt", 6969, 0m);
-        Menu.accountMenu(newAccount);
+        KontoData kd_placeholder = new();
+        Account acn_placeholder = new(kd_placeholder);
+        //Account newAccount = AF.SkapaAccount(AccountType.SPARKONTO, "Bullen Grodtvätt", 6969, 0m);
+        //Menu.accountMenu(acn_placeholder);
     }
 }
