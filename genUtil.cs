@@ -8,7 +8,12 @@ public static class genUtil {
         Console.WriteLine("Tryck på valfri tangent för att fortsätta...");
         Console.ReadLine();
     }
-    
+    public static void SkrivFärgPaus(string str, ConsoleColor färg) {
+        Console.ForegroundColor = färg;
+        Console.WriteLine(str);
+        Console.ResetColor();
+        Thread.Sleep(1500);
+    }
     //catch-all grejen som alla tester åker igenom, fungerar för allt om den används med rätt logik...
     public record ValideringsResultat<T>(bool succee, T value, string msg); //sjukt tips från LLM efter jag frågade om tips för förbättringar, exdee
     public static ValideringsResultat<string> testaValideraMejl(string? input) {
@@ -40,55 +45,52 @@ public static class genUtil {
 
         */
 
+        //Console.WriteLine("\nMEJL BLEV RÄTT"); //MLG PRINTF.DEBUG
         return new(true, validInput, "Giltlig mejladress!"); //return bool, str, (string)message;
     }
-    
-    public static ValideringsResultat<string> testaValideraNamn(string? input) {
+    public static ValideringsResultat<string> testaValideraFulltNamn(string? input) {
+        
         if (string.IsNullOrWhiteSpace(input)) {
-            return new(false, "", "Detta fält kan inte lämnas tomt.");
+            return new(false, "", ""); //alt. log msg: null string
         }
+
+        if (input.Length < 3 || input.Length > 64) {
+            return new(false, input, ""); //alt. log msg: orimlig längd på hela namnet
+        }
+
+        string[] delar = input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (delar.Length < 2) {
+            return new(false, input, ""); //alt. log msg: saknar två namn
+        }
+        foreach (string p in delar) {
+            if (!p.All(char.IsLetter)) {
+                return new(false, input, ""); //alt. log msg: namnet innehåller mer än bara bokstäver
+            }
+        }
+
+/*
+        FUNKAR INTE FÖR MIN REFACTORING, MEN DET VAR KUL ATT TESTA REGEX
+        
         if (Regex.IsMatch(input, "[^\\p{L}-']")) {
-            return new(false, "", "Ogiltliga tecken i fältet.");
+            return new(false, "", ""); //alt. log msg: fult namn
         }
+*/
 
-        return new(true, input, "Giltligt");
+        //Console.WriteLine("\nNAMN BLEV RÄTT"); //MLG PRINTF.DEBUG
+        return new(true, input, ""); //alt. log msg: Aaaw hell yeah.
     }
-    public static ValideringsResultat<int> testaValideraPIN() {
-        //char[] input = []; //nah klydd, C# har massa färdiga funktioner för strings så...
-        string input = "";
-        int validInput = 0;
+    public static ValideringsResultat<int> testaValideraPIN(int input) {
 
-        while (true) {
-            var key = Console.ReadKey(intercept: true);
-
-        //ENTER
-            if (key.Key == ConsoleKey.Enter) {
-                if (input.Length != 4) { //Remember: order on if checks matter...
-                    return new(false, 0, "PIN-koden måste bestå av ett fyr-siffrigt antal");
-                }
-                if (!int.TryParse(input, out validInput)) {
-                    return new(false, 0, "PIN-koden kan endast bestå av siffror");
-                } else {
-                    return new(true, validInput, "Din PIN-kod har registrerats");
-                }
-            }
-        //BACKSPACE
-            if (key.Key == ConsoleKey.Backspace && input.Length > 0) {
-                input = input[..^1];
-                Console.Write("\b \b"); //tur att man höll på med text-adventure i C asså...
-                continue; //skip the other if-checks cuz behövs ej om du tryckt backspace
-            }
-        //SIFFRA
-            if (char.IsDigit(key.KeyChar)) {
-
-                if (input.Length < 4 && key.Key != ConsoleKey.Backspace) {
-                    input += key.KeyChar;
-                    Console.Write(key.KeyChar);
-                }
-            }
-        }     
+        if (input < 1000 && input > 9999) { //ej inom 4-siffrigt
+            return new(false, 0, "");
+        }
+        
+        //Console.WriteLine("\nPIN BLEV RÄTT\n"); //MLG PRINTF.DEBUG
+        return new(true, input, "");
     }
-}
+
+}  
 
 /*
     public static bool testaValideraMejl(string input, out string validInput) { //notera: ej skriven att tillåta lokala mejlformat

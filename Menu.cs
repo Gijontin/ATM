@@ -1,3 +1,5 @@
+using System.Drawing;
+
 public class Menu {
     private const string arrow = "--> ";
     private readonly KontoHanterare _KH;
@@ -13,6 +15,8 @@ public class Menu {
     }
     private void StorBankHeader() {
         
+        Console.Clear();
+
         string header = "StorBank - För Dem Som Tål Riktigt Mycket Bank";
         string midPad = "|$$$|$$$|$$$|$$$|$$$|$$$|";
 
@@ -59,110 +63,133 @@ public class Menu {
         }
         genUtil.pressToContinue();
     }
-    private void SkrivRöttSleep(string str) {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine(str);
-        Console.ResetColor();
-        Thread.Sleep(1500);
+    private int pinPut() {
+        //char[] input = []; //nah klydd, C# har massa färdiga funktioner för strings så...
+        
+        string input = "";
+        int validInput = 0;
+
+        Console.WriteLine("\nAnge din önskade fyr-siffriga PIN kod.");
+        
+
+        while (true) {
+            var key = Console.ReadKey(intercept: true);
+
+        //ENTER
+            if (key.Key == ConsoleKey.Enter) {
+                if (input.Length != 4) { //Remember: order on if checks matter...
+                    genUtil.SkrivFärgPaus("\nPIN-koden måste bestå av ett fyr-siffrigt antal", ConsoleColor.Red);
+                    continue;
+                }
+                if (!int.TryParse(input, out validInput)) {
+                    genUtil.SkrivFärgPaus("\nPIN-koden kan endast bestå av siffror", ConsoleColor.Red);
+                    continue;
+                } else {
+                    return validInput;
+                }
+            }
+        //BACKSPACE
+            if (key.Key == ConsoleKey.Backspace && input.Length > 0) {
+                input = input[..^1];
+                Console.Write("\b \b"); //tur att man höll på med text-adventure i C asså...
+                continue; //skip the other if-checks cuz behövs ej om du tryckt backspace
+            }
+        //SIFFRA
+            if (char.IsDigit(key.KeyChar)) {
+
+                if (input.Length < 4 && key.Key != ConsoleKey.Backspace) {
+                    input += key.KeyChar;
+                    Console.Write(key.KeyChar);
+                }
+            }
+        } 
     }
     private string getName() {
-        genUtil.ValideringsResultat<string> resultat;
-        //parse deez bad boiz
-        string name;
-        string surname;
-        
+        string? fullname;
         do {
-            Console.WriteLine("\nAnge ditt förnamn:");
-            resultat = genUtil.testaValideraNamn(Console.ReadLine()); //"Console.ReadLine()" kan anses vara frontend här och testaValidera är backend (I think)... 
+            Console.WriteLine("Ange ditt för- och efternamn:");
+            fullname = Console.ReadLine();
 
-            if (!resultat.succee) {
-                SkrivRöttSleep(resultat.msg);
+            if (string.IsNullOrWhiteSpace(fullname)) {
+                genUtil.SkrivFärgPaus("\nDu måste fylla i ett namn.", ConsoleColor.Red);
+                StorBankHeader();
+                continue; //undviker att splitta en null string
             }
-        } while (!resultat.succee);
-        name = resultat.value;
 
-        do {
-            Console.WriteLine("\nAnge ditt efternamn:");
-            resultat = genUtil.testaValideraNamn(Console.ReadLine());
+            fullname.Trim(); //kraschar om jag försöker trimma null ))))
 
-            if (!resultat.succee) {
-                SkrivRöttSleep(resultat.msg);
+            string[] split = fullname.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            if (split.Length < 2) {
+                genUtil.SkrivFärgPaus("\nEfternamn saknas.", ConsoleColor.Red);
+                StorBankHeader();
+                continue; //VIKTIG, skippar return
             }
-        } while (!resultat.succee);
-        surname = resultat.value;
+            
+            return fullname;
 
-        string helaNamnet = name + " " + surname;
-        ValideringsTextFörNamn(helaNamnet, true);
-        return helaNamnet;
+        } while (true);
     }
-    private int getPIN() { //"getPIN" fyller egentligen mellansteget från frontend till backend, testavalidera har just nu en
-                                  //frontend/backend hybrid funktion (testaValidera ska egentligen bara ha logik-checken från 'Enter')
-                                  //medans allt annat input grejs som händer i testValidera bör hända i frontend, dvs funktion här i Menu
-        genUtil.ValideringsResultat<int> resultat;
-
-        do {
-            Console.WriteLine("\nAnge din önskade fyr-siffriga PIN-kod:");
-            resultat = genUtil.testaValideraPIN();
-
-            if (!resultat.succee) {
-                SkrivRöttSleep(resultat.msg);
-            }
-        } while (!resultat.succee);
-
-        return resultat.value;
-    }
-    public string getMejl() { //wrapper
-        genUtil.ValideringsResultat<string> resultat;
+    public string getMejl() {
+        string? mejl;
 
         do {
             Console.WriteLine("\nAnge din mejladress:");
-            resultat = genUtil.testaValideraMejl(Console.ReadLine());
+            mejl = Console.ReadLine();
 
-            if (!resultat.succee) {
-                SkrivRöttSleep(resultat.msg);
+            if (string.IsNullOrWhiteSpace(mejl)) {
+                genUtil.SkrivFärgPaus("\nDu måste fylla i en mejladress.", ConsoleColor.Red);
+                StorBankHeader();
+                continue;
             }
-        } while (!resultat.succee);
 
-        return resultat.value;
+            mejl.Trim(); //efter null-check, att försöka trimma null blir krasch...
+
+            if (!mejl.Contains('@')) {
+                genUtil.SkrivFärgPaus("\nMejladressen måste innehålla ett snabel-a.", ConsoleColor.Red);
+                StorBankHeader();
+                continue;
+            }
+
+            int kanelbullensUtpost = mejl.IndexOf('@');
+            if (kanelbullensUtpost == mejl.Length - 1) {
+                genUtil.SkrivFärgPaus("\nMejladressen saknar domän.", ConsoleColor.Red);
+                StorBankHeader();
+                continue;
+            }
+
+            string domän = mejl.Substring(kanelbullensUtpost + 1);
+            if (!domän.Contains('.')) {
+                genUtil.SkrivFärgPaus("\nDomänen saknar en punkt.", ConsoleColor.Red);
+                StorBankHeader();
+                continue;
+            }
+
+            return mejl;
+
+        } while (true);
     }
+
     public void RequestCreateAccount() {
         Console.Clear();
         StorBankHeader();
 
-    // MOVE THIS PART TO KONTOHANTERARE OR OTHER BACKEND------------------------
         KontoData kd = new();
     
         //userinput
         kd.fullname = getName();
         kd.mejladress = getMejl();
-        kd.pin = getPIN();
+        kd.pin = pinPut();
 
-        //system auto-fill
-        kd.kontotyp = AccountType.SPARKONTO;
-        kd.balance = 0m;
-        kd.kontonummer = 0;
-
-        kd.skapat = DateTime.Now;
-    //--------------------------------------------------------------------------
-
-        _KH.CreateAccount(kd);
+        if (!_KH.TryCreateAccount(kd)) {
+            Console.WriteLine("\n\nNågot blev fel, försök igen...");
+        } else {
+            Console.WriteLine("\n\nKontot har skapats!\n");
+        }
             
-        Console.WriteLine("\nKontot har skapats!\n");
+        
         genUtil.pressToContinue();
-        
-        /*
-        - Skapa ett account via denna datan
-        KontoHanteraren.AccountCreate(Kd);
-        
-        - Spara acconutet i en Dictionary där key:n är mejladressen(username, typ)
-            //KontoHanteraren gör detta...
 
-        - Skriv någon metod som tar emot PIN, dubbelkollar den mot kontot för tillträde att logga in
-          på kontot genom att injicera det i accountMenu för att komma åt dess funktioner
-            //sub-funktion i kontoHanteraren validerar detta, ganska någon privat metod i Account synergize:ar verifikationen där med...
-        */
-
-        
         return;
     }
     public void RequestLoginAccount() {
