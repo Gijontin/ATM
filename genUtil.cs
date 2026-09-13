@@ -58,8 +58,8 @@ public static class genUtil {
             return new(false, input, ""); //alt. log msg: orimlig längd på hela namnet
         }
 
-        string[] delar = input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
+        string[] delar = input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); //tim() och removeemptyentries tar bort splits som råkar framkomma av...
+                                                                                         //dubbelmellanrum, tror jag...
         if (delar.Length < 2) {
             return new(false, input, ""); //alt. log msg: saknar två namn
         }
@@ -80,10 +80,16 @@ public static class genUtil {
         //Console.WriteLine("\nNAMN BLEV RÄTT"); //MLG PRINTF.DEBUG
         return new(true, input, ""); //alt. log msg: Aaaw hell yeah.
     }
-    public static ValideringsResultat<int> testaValideraPIN(int input) {
+    public static ValideringsResultat<string> testaValideraPIN(string? input) {
 
-        if (input < 1000 && input > 9999) { //ej inom 4-siffrigt
-            return new(false, 0, "");
+        if (string.IsNullOrWhiteSpace(input)) {
+            return new(false, "", "");
+        }
+        if (input.Length != 4) {
+            return new(false, input, "");
+        }
+        if (!input.All(c => c >= '0' && c <= '9')) { //Tillåter endast UNICODE 1 till 9 siffror, filtrerar bort arabiska och devanagari numeraler
+            return new(false, input, "");
         }
         
         //Console.WriteLine("\nPIN BLEV RÄTT\n"); //MLG PRINTF.DEBUG

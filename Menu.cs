@@ -42,36 +42,13 @@ public class Menu {
         Console.WriteLine();
         Console.ResetColor();
     }
-    private void ValideringsTextFörNamn(string str1, bool ärGiltligt) {
-        Console.WriteLine();
-        Console.Write("Namnet: ");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write($"{str1} ");
-        Console.ResetColor();
-        Console.Write("är ");
-
-        if (ärGiltligt) {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("giltligt!\n\n");
-            Console.ResetColor();  
-        } else {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("ogiltligt!");
-            Console.ResetColor();
-            Console.Write(" Försök igen...\n\n");
-            
-        }
-        genUtil.pressToContinue();
-    }
-    private int pinPut() {
+    private string pinPut() {
         //char[] input = []; //nah klydd, C# har massa färdiga funktioner för strings så...
         
         string input = "";
-        int validInput = 0;
 
         Console.WriteLine("\nAnge din önskade fyr-siffriga PIN kod.");
         
-
         while (true) {
             var key = Console.ReadKey(intercept: true);
 
@@ -81,11 +58,11 @@ public class Menu {
                     genUtil.SkrivFärgPaus("\nPIN-koden måste bestå av ett fyr-siffrigt antal", ConsoleColor.Red);
                     continue;
                 }
-                if (!int.TryParse(input, out validInput)) {
+                if (!input.All(char.IsDigit)) {
                     genUtil.SkrivFärgPaus("\nPIN-koden kan endast bestå av siffror", ConsoleColor.Red);
                     continue;
                 } else {
-                    return validInput;
+                    return input.Trim();
                 }
             }
         //BACKSPACE
@@ -210,8 +187,16 @@ public class Menu {
         foreach (var kn in _KH.AccountListan) {
             Console.WriteLine(kn.Key);
         }
-
         Console.WriteLine();
+
+        //test2
+        foreach (var kh in _KH.AccountAuthListan) {
+            Console.WriteLine(Convert.ToBase64String(kh.Value.saltLakrits));
+            Console.WriteLine(Convert.ToBase64String(kh.Value.hashKaka));
+            Console.WriteLine();
+        }
+        Console.WriteLine();
+        
         genUtil.pressToContinue();
     }
 

@@ -35,27 +35,8 @@ public class Account {
 //--------------------------------------------------------------------------------------------------------------------
     
     public Account(KontoData kd) {
-/*
-public Account(int kontonummer, AccountType kontotyp, string? fullname, int pin, DateTime skapat, decimal balance) {
-    _kontonummer = kontonummer;
-    _kontotyp    = kontotyp;
-    _fullname    = fullname;
-    _pin          = pin;
-    _skapat      = skapat;
-    _balance     = balance;
-
-//skriv om konstruktorn att bara ta in KontoData parameter...
-    KontoData kd = new() {
-        kontonummer = kontonummer,
-        kontotyp = kontotyp,
-        fullname = fullname,
-        pin = pin,
-        skapat = skapat,
-        balance = balance,
-    };
-*/
-    _data = kd;
-}
+        _data = kd;
+    }
 
     public void DisplayTransaktionsHistorik() {
         
