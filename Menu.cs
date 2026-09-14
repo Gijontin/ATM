@@ -1,4 +1,4 @@
-using System.Drawing;
+using System.Security.Cryptography;
 
 public class Menu {
     private const string arrow = "--> ";
@@ -42,7 +42,7 @@ public class Menu {
         Console.WriteLine();
         Console.ResetColor();
     }
-    private string pinPut() {
+    private string getPINput() {
         //char[] input = []; //nah klydd, C# har massa färdiga funktioner för strings så...
         
         string input = "";
@@ -146,7 +146,6 @@ public class Menu {
 
         } while (true);
     }
-
     public void RequestCreateAccount() {
         Console.Clear();
         StorBankHeader();
@@ -156,7 +155,7 @@ public class Menu {
         //userinput
         kd.fullname = getName();
         kd.mejladress = getMejl();
-        kd.pin = pinPut();
+        kd.pin = getPINput();
 
         if (!_KH.TryCreateAccount(kd)) {
             Console.WriteLine("\n\nNågot blev fel, försök igen...");
@@ -175,15 +174,21 @@ public class Menu {
 
         //ja du, gissa vad som ska hända här...
 
-        //be användaren skicka in username
-            // - backend checkar om de hittar username 
-            // > ny meny_segment som efterfrågar valid password (pinkoden i detta fallet)
-            // > backend checkar validerar PIN
-            // - vid godkänt hämtar backend konto information och menyn tar dig till...
-            //...account menyn med account-specifika menyOptions som request:ar accountets metoder
+        //ta username och lösen
+        KontoData kd = new(); //byt KontoData till usrname/pass record
+            kd.mejladress = getMejl();
+            kd.pin = getPINput();
+
+        accountMenu(_KH.TryLoginAccount(kd).account);
+        //skicka detta till den backend fnuktion som sköter detta för valideringcheck
+            //om usrname finns och pin:en blir korrekt hash:ad hämta då kontot och skicka dess data
+            //tillbaka till en menu som visar kontot
+
+            //vet ej riktigt om frontend-menyn i sig sedan ska ha requests om ändringar på kontot så som dep/with etc till backend
+            //eller om dessa funktion-requests måste inkapsuleras ännu bättre i backend...
 
 
-        //test
+//debug test (om konto skapas och hålls i cache) -----------------------------
         foreach (var kn in _KH.AccountListan) {
             Console.WriteLine(kn.Key);
         }
@@ -191,12 +196,15 @@ public class Menu {
 
         //test2
         foreach (var kh in _KH.AccountAuthListan) {
-            Console.WriteLine(Convert.ToBase64String(kh.Value.saltLakrits));
-            Console.WriteLine(Convert.ToBase64String(kh.Value.hashKaka));
-            Console.WriteLine();
+            if (kh.Value.saltLakrits != null && kh.Value.hashKaka != null){
+                Console.WriteLine(Convert.ToBase64String(kh.Value.saltLakrits));
+                Console.WriteLine(Convert.ToBase64String(kh.Value.hashKaka));
+                Console.WriteLine();
+            }
         }
         Console.WriteLine();
-        
+//-----------------------------------------------------------------------------
+
         genUtil.pressToContinue();
     }
 

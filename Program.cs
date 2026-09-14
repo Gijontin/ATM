@@ -7,6 +7,9 @@ class Program {
         REMEMBER:
             REMOVE VALIDATION SHID OUT OF genUtil AT SOME POINT...
 
+            BYGG OM/SEPARERA KontoData TILL FLERTAL RECORDS SOM SKÖTER LITE OLIKA SAKER
+                TEX: LOGIN(username och lösenord strings, endast!) ETC...
+
         TO DO:
             - SQUEAL UP DAT DICTIONARY DATABASE
             - MAKE THE WHOLE SYSTEM (AND FLOW) FOR ACCOUNT LOGIN

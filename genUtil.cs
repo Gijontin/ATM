@@ -1,3 +1,5 @@
+using System.Dynamic;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 public static class genUtil {
@@ -58,7 +60,7 @@ public static class genUtil {
             return new(false, input, ""); //alt. log msg: orimlig längd på hela namnet
         }
 
-        string[] delar = input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); //tim() och removeemptyentries tar bort splits som råkar framkomma av...
+        string[] delar = input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries); //Trim() och removeemptyentries tar bort splits som råkar framkomma av...
                                                                                          //dubbelmellanrum, tror jag...
         if (delar.Length < 2) {
             return new(false, input, ""); //alt. log msg: saknar två namn
@@ -68,9 +70,9 @@ public static class genUtil {
                 return new(false, input, ""); //alt. log msg: namnet innehåller mer än bara bokstäver
             }
         }
-
 /*
-        FUNKAR INTE FÖR MIN REFACTORING, MEN DET VAR KUL ATT TESTA REGEX
+        FUNKAR INTE FÖR MIN REFACTORING, MEN DET VAR KUL ATT TESTA REGEX (REGEX ÄR VISST BÄTTRE (optimization/klydd -mässigt) FÖR ATT CHECKA FASTA FORMAT-REGLER PÅ TEXT
+                                                                          TEX VAD SOM MÅSTE INKLUDERAS ELLER EXKLDERAS)
         
         if (Regex.IsMatch(input, "[^\\p{L}-']")) {
             return new(false, "", ""); //alt. log msg: fult namn
@@ -95,7 +97,25 @@ public static class genUtil {
         //Console.WriteLine("\nPIN BLEV RÄTT\n"); //MLG PRINTF.DEBUG
         return new(true, input, "");
     }
+    public static ValideringsResultat<AutentiseringData> testaValideraHash(string? pinput, AutentiseringData data) {
+        
+        if (string.IsNullOrWhiteSpace(pinput) || data.saltLakrits == null || data.hashKaka == null) {
+            return new(false, data, "");
+        }
 
+        //hasha:a (data.salt + pinput) = tempHash
+        using var pbkdf2 = new Rfc2898DeriveBytes(pinput, data.saltLakrits, data.iterationer, HashAlgorithmName.SHA256);
+        byte[] tempHash = pbkdf2.GetBytes(32);
+        
+
+        bool jämntidsNormaliserarMatchCheck = CryptographicOperations.FixedTimeEquals(tempHash, data.hashKaka);
+        
+        if (jämntidsNormaliserarMatchCheck) {
+            return new(true, data, ""); //great Success, very najs!
+        } else {
+            return new(false, data, ""); //Icke matchande PIN
+        }
+    }
 }  
 
 /*
