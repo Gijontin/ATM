@@ -3,15 +3,10 @@
     OCH HANTERA UI UPDATES BASERAT PÅ SERVERNS SVAR...
 */
 
-public class Account {
-    public readonly KontoData _data;
+public class Account(KontoData kd) {
+    public KontoData _data { get; private set; } = kd;
 
 //-------- LÅT KontoData TA ÖVER DETTA (så blir Account mest bara en funktionswrapper för KontoData) ----------------
-    private readonly int _kontonummer;
-    private AccountType _kontotyp; //sikta på databasdriven/value objects eller polymorfiska typer i framtiden
-    private string? _fullname;
-    private readonly int _pin;
-    private readonly DateTime _skapat;
     private decimal _balance; //decimal eftersom både double och float har avrundningsfel
 //--------------------------------------------------------------------------------------------------------------------
     //private readonly List<bankomat.transaktionsHistorik> _transaktioner = new List<bankomat.transaktionsHistorik>();
@@ -33,10 +28,6 @@ public class Account {
     private const string _uttag = "uttag"; //(egentligen)server-side var.
     private const string _insättning = "insättning"; //(egentligen)server-side var.
 //--------------------------------------------------------------------------------------------------------------------
-    
-    public Account(KontoData kd) {
-        _data = kd;
-    }
 
     public void DisplayTransaktionsHistorik() {
         

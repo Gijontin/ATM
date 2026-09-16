@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-
 public class Menu {
     private const string arrow = "--> ";
     private readonly KontoHanterare _KH;
@@ -179,32 +177,22 @@ public class Menu {
             kd.mejladress = getMejl();
             kd.pin = getPINput();
 
-        accountMenu(_KH.TryLoginAccount(kd).account);
-        //skicka detta till den backend fnuktion som sköter detta för valideringcheck
-            //om usrname finns och pin:en blir korrekt hash:ad hämta då kontot och skicka dess data
-            //tillbaka till en menu som visar kontot
+        var loginResultat = _KH.TryLoginAccount(kd);
 
-            //vet ej riktigt om frontend-menyn i sig sedan ska ha requests om ändringar på kontot så som dep/with etc till backend
-            //eller om dessa funktion-requests måste inkapsuleras ännu bättre i backend...
-
-
-//debug test (om konto skapas och hålls i cache) -----------------------------
-        foreach (var kn in _KH.AccountListan) {
-            Console.WriteLine(kn.Key);
+        if (loginResultat.godkänt) {
+            accountMenu(loginResultat.account);
+        } else {
+            Console.WriteLine("\nNågot blev fel, försök igen...");
         }
-        Console.WriteLine();
-
-        //test2
-        foreach (var kh in _KH.AccountAuthListan) {
-            if (kh.Value.saltLakrits != null && kh.Value.hashKaka != null){
-                Console.WriteLine(Convert.ToBase64String(kh.Value.saltLakrits));
-                Console.WriteLine(Convert.ToBase64String(kh.Value.hashKaka));
-                Console.WriteLine();
-            }
+/*
+        if (_KH.TryLoginAccount(kd).godkänt) {
+            accountMenu(_KH.TryLoginAccount(kd).account);
+        } else {
+            Console.WriteLine("\nNågot blev fel, försök igen...");
         }
-        Console.WriteLine();
-//-----------------------------------------------------------------------------
+*/
 
+        Console.WriteLine();
         genUtil.pressToContinue();
     }
 
